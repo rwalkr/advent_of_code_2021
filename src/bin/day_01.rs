@@ -7,7 +7,7 @@ use structopt::StructOpt;
 struct Opts {
     part_no: usize,
 
-    #[structopt(parse(from_os_str), default_value = "data/day_01_a.txt")]
+    #[structopt(parse(from_os_str), default_value = "data/day_01.txt")]
     filename: PathBuf,
 }
 
