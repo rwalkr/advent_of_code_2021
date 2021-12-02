@@ -11,17 +11,17 @@ struct Opts {
     filename: PathBuf,
 }
 
-fn part_1(filename: impl AsRef<Path>) {
+fn part_1(filename: impl AsRef<Path>) -> usize {
     let lines = read_lines(filename).expect("Can't read input");
     let depths: Vec<u32> = lines
         .into_iter()
         .filter_map(|l| l.unwrap().parse().ok())
         .collect();
     let increases = depths.windows(2).filter(|vals| vals[1] > vals[0]).count();
-    println!("{}", increases);
+    increases
 }
 
-fn part_2(filename: impl AsRef<Path>) {
+fn part_2(filename: impl AsRef<Path>) -> usize {
     let lines = read_lines(filename).expect("Can't read input");
     let depths: Vec<u32> = lines
         .into_iter()
@@ -32,14 +32,29 @@ fn part_2(filename: impl AsRef<Path>) {
         .windows(2)
         .filter(|vals| vals[1] > vals[0])
         .count();
-    println!("{}", increases);
+    increases
 }
 
 fn main() {
     let opts = Opts::from_args();
     match opts.part_no {
-        1 => part_1(opts.filename),
-        2 => part_2(opts.filename),
+        1 => println!("{}", part_1(opts.filename)),
+        2 => println!("{}", part_2(opts.filename)),
         _ => panic!("Invalid part"),
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    pub fn test_part_1() {
+        assert_eq!(7, part_1("data/day_01_test.txt"));
+    }
+
+    #[test]
+    pub fn test_part_2() {
+        assert_eq!(5, part_2("data/day_01_test.txt"));
     }
 }
