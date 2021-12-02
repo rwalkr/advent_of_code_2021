@@ -1,3 +1,4 @@
+use std::convert::TryFrom;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
@@ -10,4 +11,29 @@ where
 {
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
+}
+
+pub fn iter_lines(filename: impl AsRef<Path>) -> impl Iterator<Item = String> {
+    let lines = read_lines(filename).expect("Can't read input");
+    lines.into_iter().map(Result::unwrap)
+}
+
+pub fn from_split_lines<T, F, const N: usize>(
+    lines: impl Iterator<Item = String>,
+    f: F,
+) -> impl Iterator<Item = T>
+where
+    T: Sized,
+    F: 'static + Fn([String; N]) -> T,
+{
+    lines.map(move |l| {
+        let s = l
+            .trim()
+            .splitn(N, " ")
+            .map(String::from)
+            .collect::<Vec<String>>();
+        let args = <[String; N]>::try_from(s).ok().unwrap();
+        let x: T = f(args);
+        x
+    })
 }

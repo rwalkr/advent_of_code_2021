@@ -1,9 +1,7 @@
+use std::path::PathBuf;
 
-use std::path::{Path, PathBuf};
-
-use advent_of_code_2021::read_lines;
+use advent_of_code_2021::{from_split_lines, iter_lines};
 use structopt::StructOpt;
-use std::convert::TryFrom;
 
 #[derive(StructOpt)]
 struct Opts {
@@ -13,42 +11,32 @@ struct Opts {
     filename: PathBuf,
 }
 
-fn iter_lines(filename: impl AsRef<Path>) -> impl Iterator<Item=String> {
-    let lines = read_lines(filename).expect("Can't read input");
-    lines
-        .into_iter()
-        .map(Result::unwrap)
+fn parse_input(lines: impl Iterator<Item = String>) -> impl Iterator<Item = (String, u32)> {
+    from_split_lines(lines, |args: [String; 2]| {
+        let cmd = args[0].clone();
+        let val = args[1].parse::<u32>().unwrap();
+        (cmd, val)
+    })
 }
 
-fn part_1(lines: impl Iterator<Item=String>) -> u32 {
-    let (final_p, final_d) = lines.map(|l| {
-        let v = l.splitn(2, " ").collect::<Vec<&str>>();
-        let [cmd, x] = <[&str; 2]>::try_from(v).ok().unwrap();
-        (String::from(cmd), x.parse::<u32>().unwrap())
-    })
-    .fold((0, 0), |(p, d), (cmd, x)| {
-        match cmd.as_str() {
+fn part_1(lines: impl Iterator<Item = String>) -> u32 {
+    let (final_p, final_d) =
+        parse_input(lines).fold((0, 0), |(p, d), (cmd, x)| match cmd.as_str() {
             "forward" => (p + x, d),
             "up" => (p, d - x),
             "down" => (p, d + x),
-            _ => panic!("Invalid command")
-        }
-    });
+            _ => panic!("Invalid command"),
+        });
     final_p * final_d
 }
 
-fn part_2(lines: impl Iterator<Item=String>) -> u32 {
-    let (final_p, final_d, _) = lines.map(|l| {
-        let v = l.splitn(2, " ").collect::<Vec<&str>>();
-        let [cmd, val] = <[&str; 2]>::try_from(v).ok().unwrap();
-        (String::from(cmd), val.parse::<u32>().unwrap())
-    })
-    .fold((0, 0, 0), |(p, d, a), (cmd, x)| {
+fn part_2(lines: impl Iterator<Item = String>) -> u32 {
+    let (final_p, final_d, _) = parse_input(lines).fold((0, 0, 0), |(p, d, a), (cmd, x)| {
         let (np, nd, na) = match cmd.as_str() {
-            "forward" => (p + x, d + a*x, a),
+            "forward" => (p + x, d + a * x, a),
             "up" => (p, d, a - x),
             "down" => (p, d, a + x),
-            _ => panic!("Invalid command")
+            _ => panic!("Invalid command"),
         };
         (np, nd, na)
     });
@@ -70,15 +58,15 @@ mod test {
     use super::*;
 
     static TEST_DATA: [&str; 6] = [
-    "forward 5",
-    "down 5",
-    "forward 8",
-    "up 3",
-    "down 8",
-    "forward 2",
+        "forward 5",
+        "down 5",
+        "forward 8",
+        "up 3",
+        "down 8",
+        "forward 2",
     ];
 
-    fn test_data() -> impl Iterator<Item=String> {
+    fn test_data() -> impl Iterator<Item = String> {
         TEST_DATA.iter().map(|p| String::from(*p))
     }
 
