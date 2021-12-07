@@ -1,4 +1,4 @@
-use std::{path::{PathBuf, Iter}, ops::Range};
+use std::path::PathBuf;
 use advent_of_code_2021::iter_lines;
 use structopt::StructOpt;
 
@@ -28,7 +28,7 @@ fn read_age_counts(ages: impl Iterator<Item = u32>) -> [u64; 9] {
 }
 
 fn simulate(mut age_counts: [u64; 9], steps: usize) -> u64 {
-    for d in 0..steps {
+    for _ in 0..steps {
         let n_zero = age_counts[0];
         for i in 0..8 {
             age_counts[i] = age_counts[i+1];
@@ -99,7 +99,7 @@ mod test {
 
     #[test]
     pub fn test_part_1_real() {
-        assert_eq!(6007, part_1(real_data()));
+        assert_eq!(360610, part_1(real_data()));
     }
 
     #[test]
